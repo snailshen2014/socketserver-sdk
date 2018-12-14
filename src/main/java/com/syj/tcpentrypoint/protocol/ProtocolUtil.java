@@ -5,15 +5,15 @@ import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.syj.test.rulesengine.error.RECodecException;
-import com.syj.test.rulesengine.error.RpcException;
-import com.syj.test.rulesengine.msg.BaseMessage;
-import com.syj.test.rulesengine.msg.MessageHeader;
-import com.syj.test.rulesengine.msg.RequestMessage;
-import com.syj.test.rulesengine.msg.ResponseMessage;
-import com.syj.test.rulesengine.util.CodecUtils;
-import com.syj.test.rulesengine.util.Constants;
-import com.syj.test.rulesengine.util.ExceptionUtils;
+import com.syj.tcpentrypoint.error.RECodecException;
+import com.syj.tcpentrypoint.error.RpcException;
+import com.syj.tcpentrypoint.msg.BaseMessage;
+import com.syj.tcpentrypoint.msg.MessageHeader;
+import com.syj.tcpentrypoint.msg.RequestMessage;
+import com.syj.tcpentrypoint.msg.ResponseMessage;
+import com.syj.tcpentrypoint.util.CodecUtils;
+import com.syj.tcpentrypoint.util.Constants;
+import com.syj.tcpentrypoint.util.ExceptionUtils;
 
 import io.netty.buffer.ByteBuf;
 

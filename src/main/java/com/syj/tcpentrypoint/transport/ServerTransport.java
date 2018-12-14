@@ -3,8 +3,8 @@ package com.syj.tcpentrypoint.transport;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.syj.tcpentrypoint.error.InitErrorException;
 

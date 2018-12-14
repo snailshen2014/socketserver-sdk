@@ -2,9 +2,8 @@ package com.syj.tcpentrypoint.transport;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
-
+import org.slf4j.LoggerFactory;
 import com.syj.tcpentrypoint.util.NetUtils;
 
 import io.netty.channel.ChannelHandler;

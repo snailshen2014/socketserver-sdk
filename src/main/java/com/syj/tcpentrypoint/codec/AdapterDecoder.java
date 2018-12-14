@@ -4,9 +4,8 @@ package com.syj.tcpentrypoint.codec;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
-
+import org.slf4j.LoggerFactory;
 import com.syj.tcpentrypoint.re.REDecoder;
 import com.syj.tcpentrypoint.re.REEncoder;
 import com.syj.tcpentrypoint.transport.ServerChannelHandler;

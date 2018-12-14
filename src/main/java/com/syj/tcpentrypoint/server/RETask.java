@@ -2,8 +2,8 @@ package com.syj.tcpentrypoint.server;
 
 import java.nio.charset.Charset;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.syj.tcpentrypoint.msg.MessageBuilder;
 import com.syj.tcpentrypoint.msg.RequestMessage;

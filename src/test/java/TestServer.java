@@ -1,5 +1,5 @@
-import com.syj.test.rulesengine.transport.ServerTransport;
-import com.syj.test.rulesengine.transport.ServerTransportConfig;
+import com.syj.tcpentrypoint.transport.ServerTransport;
+import com.syj.tcpentrypoint.transport.ServerTransportConfig;
 
 public class TestServer {
 	public static void main(String[] args) {
