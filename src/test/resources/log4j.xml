@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+/**
+* Copyright 2004-2048 .
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+                     debug="false">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %t %5p [%c:%M:%L] - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="File" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="encoding" value="utf-8"/>
+        <param name="File" value="jsf-test.log"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %t %5p [%c:%M:%L] - %m%n"/>
+        </layout>
+        <!-- <filter class="org.apache.log4j.varia.LevelRangeFilter"> <param name="LevelMin"
+            value="DEBUG" /> <param name="LevelMax" value="DEBUG" /> </filter> -->
+    </appender>
+
+    <logger name="com.syj.test">
+        <level value="Trace"></level>
+    </logger>
+
+    <logger name="org.springframework">
+        <level value="INFO"></level>
+    </logger>
+
+    <root>
+        <level value="Trace"></level>
+        <!--<appender-ref ref="File" />-->
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</log4j:configuration>
