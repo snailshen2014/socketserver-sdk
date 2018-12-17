@@ -31,7 +31,10 @@ public class Constants {
     public static final int CPU_CORES = 4;
     /*---------环境变量结束-----------*/
 
-   
+    /**
+     * 默认权重 100
+     */
+    public final static int DEFAULT_PROVIDER_WEIGHT = 100;
     /**
      * 随机
      */
@@ -72,6 +75,10 @@ public class Constants {
      */
     public static final int DEFAULT_CLIENT_INVOKE_TIMEOUT = 5000;
 
+    /**
+     * 客户端channelhandler名字
+     */
+    public static final String CLIENT_CHANNELHANDLE_NAME = "RE_CLIENT_CHANNELHANDLE";
     
     /**
      * 线程池类型：固定线程池
