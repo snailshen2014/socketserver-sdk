@@ -21,8 +21,6 @@ public class MessageBuilder {
 		
 		RequestMessage requestMessage = new RequestMessage();
 		requestMessage.getMsgHeader().setMsgType(Constants.REQUEST_MSG);
-		Integer requestId = 23456789;
-		requestMessage.setRequestId(requestId);
 		requestMessage.getMsgHeader().addHeadKey(HeadKey.topicid, topicId);
 		requestMessage.getMsgHeader().addHeadKey(HeadKey.productkey, productKey);
 		return requestMessage;

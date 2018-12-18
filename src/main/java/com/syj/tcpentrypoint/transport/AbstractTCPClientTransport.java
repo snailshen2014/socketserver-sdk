@@ -1,20 +1,19 @@
 package com.syj.tcpentrypoint.transport;
 
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.Charset;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.syj.tcpentrypoint.config.ClientConfig;
-import com.syj.tcpentrypoint.error.RpcException;
+import com.syj.tcpentrypoint.error.ClientTimeoutException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
-import com.syj.tcpentrypoint.util.Constants;
-import com.syj.tcpentrypoint.util.NetUtils;
+import com.syj.tcpentrypoint.protocol.ProtocolUtil;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Title: TCP类型的长连接<br>
@@ -33,7 +32,8 @@ abstract class AbstractTCPClientTransport extends AbstractClientTransport {
 	 * 请求id计数器（一个Transport一个）
 	 */
 	private final AtomicInteger requestId = new AtomicInteger();
-
+	
+	 private final ConcurrentHashMap<Integer, ResponseMessage> responseMap = new ConcurrentHashMap<Integer, ResponseMessage>();
 	/**
 	 * 构造函数
 	 *
@@ -65,7 +65,53 @@ abstract class AbstractTCPClientTransport extends AbstractClientTransport {
      */
     public void receiveResponse(ResponseMessage msg) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("receiveResponse..{}", msg);
+            LOGGER.trace("receiveResponse {}", msg);
+        }
+        responseMap.put(msg.getRequestId(), msg);
+    }
+    
+    public ResponseMessage getMessage(Integer id) {
+    	ResponseMessage msg = responseMap.get(id);
+    	if (msg != null)
+    		responseMap.remove(id);
+    	return msg;
+    }
+    
+    @Override
+    public ResponseMessage send(BaseMessage msg, int timeout) {
+        Integer msgId = null;
+        try {
+        	//do some thing
+            super.currentRequests.incrementAndGet();
+            msgId = genarateRequestId();
+            msg.setRequestId(msgId);
+            
+            ByteBuf byteBuf = PooledBufHolder.getBuffer();
+    		byteBuf = ProtocolUtil.encode(msg, byteBuf);
+    		msg.setMsg(byteBuf);
+            return doSend(msg, timeout);
+        }  catch (ClientTimeoutException e) {
+            try {
+                if (msgId != null) {
+                	responseMap.remove(msgId);
+                }
+            } catch (Exception e1) {
+                LOGGER.error(e1.getMessage(), e1);
+            }
+            throw e;
+        } finally {
+            super.currentRequests.decrementAndGet();
         }
     }
+
+    /**
+     * 长连接默认的调用方法
+     *
+     * @param msg
+     *         消息
+     * @param timeout
+     *         超时时间
+     * @return 返回结果Future
+     */
+    abstract ResponseMessage doSend(BaseMessage msg, int timeout);
 }

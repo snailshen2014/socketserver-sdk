@@ -104,7 +104,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
             } else if (msg instanceof RequestMessage) {
                 RequestMessage request = (RequestMessage) msg;
-                // handle heartbeat Request (dubbo)
                 if(request.isHeartBeat()) {
                     ResponseMessage response = MessageBuilder.buildHeartbeatResponse(request);
                     channel.writeAndFlush(response);

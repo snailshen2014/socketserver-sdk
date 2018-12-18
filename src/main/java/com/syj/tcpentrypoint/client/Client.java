@@ -32,7 +32,7 @@ import com.syj.tcpentrypoint.util.StringUtils;
 
 /**
  * 
- * @des :实现了客户端下长连接的维护，长连接选择，同步异步调用等公共方法，子类需要实现具体的规则
+ * @des :实现了客户端下长连接的维护，长连接选择,子类需要实现具体的规则
  * @author:shenyanjun1
  * @date :2018-12-17 10:03
  */
@@ -127,19 +127,18 @@ public abstract class Client {
 	 */
 	protected List<Provider> buildProviderList() {
 		List<Provider> tmpProviderList = new ArrayList<Provider>();
-		;
 		String svrList = clientConfig.getServerList();
 		if (StringUtils.isNotEmpty(svrList)) {
 			String[] providerStrs = StringUtils.splitWithCommaOrSemicolon(svrList);
 			for (int i = 0; i < providerStrs.length; i++) {
-				String[] server = StringUtils.splitWithCommaOrSemicolon(providerStrs[i]);
+				String[] server = StringUtils.split(providerStrs[i],":");
 				if (server.length != 2) {
 					throw new IllegalConfigureException(10001, "server  ", providerStrs[i], " ip and port no match.");
 
 				}
 				String ip = server[0];
 				String port = server[1];
-				Provider provider = Provider.getProvider(providerStrs[i], 18550);
+				Provider provider = Provider.getProvider(ip, Integer.parseInt(port));
 				tmpProviderList.add(provider);
 			}
 		}
@@ -181,7 +180,7 @@ public abstract class Client {
 	protected void connectToProviders(List<Provider> providerList) {
 		final String appName = clientConfig.getAppName();
 		int providerSize = providerList.size();
-		LOGGER.info("Init provider of {}, {}, size is : {}", appName, providerSize);
+		LOGGER.info("Init provider of {},size is : {}", appName, providerSize);
 		if (providerSize > 0) {
 			// 多线程建立连接
 			int threads = Math.min(10, providerSize); // 最大10个
@@ -233,7 +232,7 @@ public abstract class Client {
 	 */
 	private void printSuccess(Provider provider, ClientTransport transport) {
 		LOGGER.info(
-				"Connect to {} provider:{} success ! The connection is "
+				"Connect to  provider:{} success ! The connection is "
 						+ NetUtils.connectToString(transport.getRemoteAddress(), transport.getLocalAddress()),
 				provider);
 	}
@@ -335,16 +334,7 @@ public abstract class Client {
 		ClientTransport transport = connection.getTransport();
 		try {
 			int timeout = clientConfig.getInvokeTimeout();//5s
-			ResponseMessage response = null;
-
-			// 同步调用
-			long start = System.currentTimeMillis();
-			try {
-				response = transport.send(msg, timeout);
-			} finally {
-				long elapsed = System.currentTimeMillis() - start;
-			}
-
+			ResponseMessage response = transport.send(msg, timeout);
 			return response;
 		} catch (ClientClosedException e) { // 连接断开异常
 			connectionHolder.aliveToRetryIfExist(provider, transport);
@@ -381,10 +371,6 @@ public abstract class Client {
 
 		// 原始服务列表数据
 		List<Provider> providers = connectionHolder.getAliveProviders();
-
-		if (invokedProviders != null && providers.size() > invokedProviders.size()) { // 总数大于已调用数
-			providers.removeAll(invokedProviders);// 已经调用异常的本次不再重试
-		}
 		if (providers.size() == 0) {
 			throw new NoAliveProviderException(clientConfig.getAppName(), connectionHolder.currentProviderList());
 		}

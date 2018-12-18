@@ -241,7 +241,7 @@ public class ClientConfig {
 			int childNioEventThreads = transportConfig.getChildNioEventThreads();
 			int threads = childNioEventThreads > 0 ? childNioEventThreads : // 用户配置
 					Math.max(6, Constants.DEFAULT_IO_THREADS); // 默认cpu+1,至少6个
-			NamedThreadFactory threadName = new NamedThreadFactory("JSF-CLI-WORKER", true);
+			NamedThreadFactory threadName = new NamedThreadFactory("RE-CLI-WORKER", true);
 			eventLoopGroup = new NioEventLoopGroup(threads, threadName);
 
 		}

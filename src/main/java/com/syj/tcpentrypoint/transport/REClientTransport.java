@@ -3,11 +3,13 @@ package com.syj.tcpentrypoint.transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.syj.tcpentrypoint.client.MsgFuture;
 import com.syj.tcpentrypoint.error.InitErrorException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
 /**
  * Title: 客户端传输层<br>
@@ -72,9 +74,23 @@ public class REClientTransport extends AbstractTCPClientTransport {
 	}
 
 	@Override
-	public ResponseMessage send(BaseMessage msg, int timeout) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResponseMessage doSend(final BaseMessage msg, int timeout) {
+		System.out.println("doSend msg=" + msg  + " ,timeout=" + timeout);
+		long begin = System.currentTimeMillis();
+		ChannelFuture callFuture = channel.writeAndFlush(msg, channel.voidPromise());
+		ResponseMessage result = null;
+		if (callFuture.isSuccess()) {
+			result = getMessage(msg.getRequestId());
+			while (Boolean.TRUE) {
+				if (result != null)
+					break;
+				long end = System.currentTimeMillis();
+				if ((end - begin) /1000 >= timeout ) {
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 }
