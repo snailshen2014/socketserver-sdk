@@ -1,18 +1,14 @@
 package com.syj.tcpentrypoint.transport;
 
-import java.nio.charset.Charset;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.syj.tcpentrypoint.config.ClientConfig;
 import com.syj.tcpentrypoint.error.ClientTimeoutException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
 import com.syj.tcpentrypoint.protocol.ProtocolUtil;
-
 import io.netty.buffer.ByteBuf;
 
 /**

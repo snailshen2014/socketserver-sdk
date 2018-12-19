@@ -80,6 +80,7 @@ public class MessageBuilder {
 		MessageHeader header = responseMessage.getMsgHeader();
 		header.setMsgType(Constants.HEARTBEAT_RESPONSE_MSG);
 		header.setMsgId(heartbeat.getRequestId());
+		responseMessage.setResponse("heartbeat check ok");
 //        header.setProtocolType(heartbeat.getProtocolType());
 //        header.setCodecType(heartbeat.getMsgHeader().getCodecType());
 		// ResponseMessage responseMessage = new ResponseMessage(false);

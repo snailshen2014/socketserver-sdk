@@ -307,7 +307,6 @@ public abstract class Client {
 		// 做一些初始化检查，例如未连接可以连接
 		try {
 			countOfInvoke.incrementAndGet(); // 计数
-			initConnections();
 			return doSendMsg(msg);
 		} finally {
 			countOfInvoke.decrementAndGet();

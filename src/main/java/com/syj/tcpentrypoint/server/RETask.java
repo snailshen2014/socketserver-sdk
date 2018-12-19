@@ -36,11 +36,8 @@ public class RETask implements Runnable {
 	@Override
 	public void run() {
 		try {
-			System.out.println("get a transpondtask and run,msg:" + this.msg);
 			ResponseMessage responseMessage = invoke(this.msg);
-		
 			logger.debug("Invoker call and Response:{}", responseMessage);
-			 
 			Future channelFuture = channel.writeAndFlush(responseMessage);
 			channelFuture.addListener(new FutureListener() {
 				@Override
@@ -57,7 +54,14 @@ public class RETask implements Runnable {
 			});
 
 		} finally {
-
+			 //release the byteBuf here
+            ByteBuf byteBuf = msg.getMsgBody();
+            if (byteBuf != null) {
+                byteBuf.release();
+            }
+            if (msg.getMsg() != null) {
+            	msg.getMsg().release();
+            }
 		}
 
 	}

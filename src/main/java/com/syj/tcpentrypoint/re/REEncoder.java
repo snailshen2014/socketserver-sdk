@@ -66,6 +66,5 @@ public class REEncoder extends MessageToByteEncoder {
 		int length = totalLength - 1; // data.readableBytes() + 4 (4指的是FULLLENGTH)
 		out.writeInt(length); // 4 for Length Field
 		out.writeBytes(data, data.readerIndex(), data.readableBytes());
-		logger.trace("out length:{},content:{}",out.readableBytes(),out.toString(Charset.defaultCharset()));
 	}
 }

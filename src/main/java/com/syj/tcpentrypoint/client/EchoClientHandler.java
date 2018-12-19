@@ -64,7 +64,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
 		int now = CALLTIMES.incrementAndGet();
 		System.out.println("read server msg:" +msg + ",times=" + now );
-		  if (now >= 100000)
+		  if (now >= 1)
 			  return;
 		ctx.write(generateRequest());
 	}
@@ -82,7 +82,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 	}
 	
 	private RequestMessage generateRequest() {
-		RequestMessage request = MessageBuilder.buildRequest("t123", "pabc");
+		RequestMessage request = MessageBuilder.buildRequest("topicId998", "syjpro");
 		ByteBuf body = PooledBufHolder.getBuffer();
 		body.writeBytes("Hello world".getBytes());
 		request.setMsgBody(body);

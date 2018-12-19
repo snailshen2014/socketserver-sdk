@@ -33,7 +33,7 @@ public class FailoverClient extends Client {
 	public ResponseMessage doSendMsg(RequestMessage msg) {
 		int time = 0;
         Throwable throwable = null;// 异常日志
-        int retries = 3;
+        int retries = 1;
         ResponseMessage result = null;
         do {
             Connection connection = super.select(msg, null);
@@ -56,7 +56,7 @@ public class FailoverClient extends Client {
                         + e.getClass().getName() + ", message is: " + e.getMessage(), e);
             }
           
-		} while (time <= retries);
+		} while (time < retries);
         return result;
 	}
 }

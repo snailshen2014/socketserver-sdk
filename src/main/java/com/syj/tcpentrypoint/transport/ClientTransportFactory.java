@@ -199,7 +199,6 @@ public class ClientTransportFactory {
 		} catch (InitErrorException e) {
 			throw e;
 		} catch (Exception e) {
-			// logger.error(e.getMessage(),e);
 			String errorStr = "Failed to build channel for host:" + host + " port:" + port + ". Cause by: "
 					+ e.getMessage();
 			InitErrorException initException = new InitErrorException(errorStr, e);

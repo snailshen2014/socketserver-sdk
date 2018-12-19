@@ -42,7 +42,6 @@ public class ProtocolUtil {
 				if (body != null) {
 					request.getMsgHeader().setHeaderLength(CodecUtils.encodeHeader(msgHeader, buffer)); // header
 					buffer = buffer.writeBytes(body); // body 
-					System.out.println("buffer size==" +buffer.readableBytes() );
 					request.getMsgHeader().setLength(buffer.readableBytes() + 1 + 4);
 				} else {
 					CodecUtils.encodeHeader(msgHeader, buffer);// header only
@@ -68,7 +67,6 @@ public class ProtocolUtil {
 	}
 
 	public static BaseMessage decode(ByteBuf byteBuf) {
-		System.out.println(byteBuf.toString(Charset.defaultCharset()));
 		MessageHeader header = null;
 		Integer msgLength = byteBuf.readableBytes() + 5;// magiccode + msg length(4 byte)
 		BaseMessage msg = null;

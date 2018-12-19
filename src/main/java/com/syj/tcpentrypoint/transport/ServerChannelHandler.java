@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.syj.tcpentrypoint.error.RpcException;
+import com.syj.tcpentrypoint.msg.MessageBuilder;
 import com.syj.tcpentrypoint.msg.MessageHeader;
 import com.syj.tcpentrypoint.msg.RequestMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
@@ -22,9 +23,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 /**
  * 
-*  @des    :server channel handler ,handle the request and do business
+ * @des :server channel handler ,handle the request and do business
  * @author:shenyanjun1
- * @date   :2018-12-14 17:17
+ * @date :2018-12-14 17:17
  */
 @ChannelHandler.Sharable
 public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
@@ -70,35 +71,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 		}
 
 	}
-
-	/*
-	 *
-	 */
-//    private boolean handleOtherMsg(ChannelHandlerContext ctx, RequestMessage requestMsg) {
-//
-//        int msgType = requestMsg.getMsgHeader().getMsgType();
-//        if (msgType == Constants.REQUEST_MSG) return false; // 正常的请求
-//        Channel channel = ctx.channel();
-//        ResponseMessage response = null;
-//        switch (msgType) {
-//            case Constants.SHAKEHAND_MSG:
-//                response = new ResponseMessage();
-//                response.getMsgHeader().setMsgType(Constants.SHAKEHAND_RESULT_MSG);
-//                response.getMsgHeader().setMsgId(requestMsg.getRequestId());
-//                //DO SHAKEHAND CHECK HERE
-//
-//                break;
-//
-//            case Constants.HEARTBEAT_REQUEST_MSG:
-////                response = MessageBuilder.buildHeartbeatResponse(requestMsg);
-//                break;
-//            default:
-//                throw new RpcException(requestMsg.getMsgHeader(), " no such msgType:" + msgType);
-//
-//        }
-//        channel.writeAndFlush(response);
-//        return true;
-//    }
 
 	/*
 	 * handle the error
@@ -164,6 +136,12 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 //        }
 	}
 
+	/**
+	 * @des handle other request
+	 * @param ctx
+	 * @param requestMsg
+	 * @return
+	 */
 	private boolean handleOtherMsg(ChannelHandlerContext ctx, RequestMessage requestMsg) {
 
 		int msgType = requestMsg.getMsgHeader().getMsgType();
@@ -172,9 +150,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 		Channel channel = ctx.channel();
 		ResponseMessage response = null;
 		switch (msgType) {
-
 		case Constants.HEARTBEAT_REQUEST_MSG:
-//			response = MessageBuilder.buildHeartbeatResponse(requestMsg);
+			response = MessageBuilder.buildHeartbeatResponse(requestMsg);
 			break;
 		default:
 			throw new RpcException(requestMsg.getMsgHeader(), " no such msgType:" + msgType);

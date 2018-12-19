@@ -59,27 +59,4 @@ public class ConnectionChannelHandler extends ChannelInboundHandlerAdapter {
                     NetUtils.channelToString(ctx.channel().remoteAddress(), ctx.channel().localAddress()), now);
         }
     }
-
-    /*private static final ConcurrentHashMap<ServerTransportConfig, AtomicInteger> MAP
-            = new ConcurrentHashMap<ServerTransportConfig, AtomicInteger>();
-
-    protected static int incrementAndGet(ServerTransportConfig transportConfig) {
-        return getCounter(transportConfig).incrementAndGet();
-    }
-
-    protected static int decrementAndGet(ServerTransportConfig transportConfig) {
-        return getCounter(transportConfig).decrementAndGet();
-    }
-
-    protected static int get(ServerTransportConfig transportConfig) {
-        return getCounter(transportConfig).get();
-    }
-
-    protected static AtomicInteger getCounter(ServerTransportConfig transportConfig) {
-        AtomicInteger counter = MAP.get(transportConfig);
-        if (counter == null) {
-            counter = CommonUtils.putToConcurrentMap(MAP, transportConfig, new AtomicInteger());
-        }
-        return counter;
-    }*/
 }
