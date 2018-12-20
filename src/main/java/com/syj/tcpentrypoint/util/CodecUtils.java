@@ -138,7 +138,7 @@ public final class CodecUtils {
 	 * @param byteBuf      报文
 	 * @param headerLength 报文长度
 	 * @return MessageHeader
-	 * @see JSFProtocol
+	 * @see REProtocol
 	 */
 	public static MessageHeader decodeHeader(ByteBuf byteBuf, int headerLength) {
 		byte msgType = byteBuf.readByte();

@@ -7,12 +7,11 @@ import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.RequestMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
 
-
-
- /**
- * Title: 失败重试<br>
- *
- * Description: <br>
+/**
+ * 
+*  @des    :失败重试
+ * @author:shenyanjun1
+ * @date   :2018-12-20 16:52
  */
 public class FailoverClient extends Client {
 

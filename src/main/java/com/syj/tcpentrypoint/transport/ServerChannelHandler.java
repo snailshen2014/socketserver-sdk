@@ -59,7 +59,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 //                        " in server channel handler : " + responseMsg.toString());
 //            }
 			// find the transport
-//            JSFClientTransport clientTransport = CallbackUtil.getClientTransport(channel);
+//            REClientTransport clientTransport = CallbackUtil.getClientTransport(channel);
 //            if (clientTransport != null) {
 //                clientTransport.receiveResponse(responseMsg);
 //            } else {

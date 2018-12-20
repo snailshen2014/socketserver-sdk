@@ -1,18 +1,16 @@
 package com.syj.tcpentrypoint.client;
 
 import java.util.List;
-
 import com.syj.tcpentrypoint.config.ClientConfig;
 import com.syj.tcpentrypoint.error.IllegalConfigureException;
 import com.syj.tcpentrypoint.error.NoAliveProviderException;
 import com.syj.tcpentrypoint.util.Constants;
 
-
-
 /**
- * Title: 负载均衡算法基类+工厂类<br>
- *
- * Description: <br>
+ * 
+*  @des    :负载均衡算法基类+工厂类
+ * @author:shenyanjun1
+ * @date   :2018-12-20 16:52
  */
 public abstract class Loadbalance {
 

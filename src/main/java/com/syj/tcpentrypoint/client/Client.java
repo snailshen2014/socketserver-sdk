@@ -332,7 +332,7 @@ public abstract class Client {
 		Provider provider = connection.getProvider();
 		ClientTransport transport = connection.getTransport();
 		try {
-			int timeout = clientConfig.getInvokeTimeout();//5s
+			int timeout = clientConfig.getInvokeTimeout();//3s
 			ResponseMessage response = transport.send(msg, timeout);
 			return response;
 		} catch (ClientClosedException e) { // 连接断开异常

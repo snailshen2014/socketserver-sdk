@@ -1,14 +1,12 @@
 package com.syj.tcpentrypoint.client;
 
 import com.syj.tcpentrypoint.config.ClientConfig;
-import com.syj.tcpentrypoint.error.IllegalConfigureException;
-import com.syj.tcpentrypoint.util.Constants;
 
 /**
- * Title: 客户端工厂类<br>
- * <p/>
- * Description: 无缓存<br>
- * <p/>
+ * 
+*  @des    :客户端工厂类
+ * @author:shenyanjun1
+ * @date   :2018-12-20 16:51
  */
 public class ClientFactory {
 

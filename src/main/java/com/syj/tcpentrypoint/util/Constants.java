@@ -73,7 +73,7 @@ public class Constants {
     /**
      * 默认consumer调用provider超时时间
      */
-    public static final int DEFAULT_CLIENT_INVOKE_TIMEOUT = 5000;
+    public static final int DEFAULT_CLIENT_INVOKE_TIMEOUT = 3000;
 
     /**
      * 客户端channelhandler名字

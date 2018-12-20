@@ -1,10 +1,14 @@
 package com.syj.tcpentrypoint.transport;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.syj.tcpentrypoint.client.MsgFuture;
 import com.syj.tcpentrypoint.error.InitErrorException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
-import com.syj.tcpentrypoint.msg.ResponseMessage;
+
 import io.netty.channel.Channel;
 
 /**
@@ -70,24 +74,13 @@ public class REClientTransport extends AbstractTCPClientTransport {
 	}
 
 	@Override
-	public ResponseMessage doSend(final BaseMessage msg, int timeout) {
-		logger.info("REClientTransport doSend msgId:{},timeout:{}",msg.getRequestId(),timeout);
-		long begin = System.currentTimeMillis();
-		ResponseMessage result = null;
+	public MsgFuture doSend(final BaseMessage msg, int timeout) {
+		logger.info("REClientTransport doSend msgId:{},timeout:{}", msg.getRequestId(), timeout);
+		final MsgFuture resultFuture = new MsgFuture(getChannel(), msg.getMsgHeader(), timeout);
+		this.addFuture(msg, resultFuture);
 		channel.writeAndFlush(msg, channel.voidPromise());
-		while (Boolean.TRUE) {
-			result = getMessage(msg.getRequestId());
-			if (result != null) {
-				break;
-			}
-			long end = System.currentTimeMillis();
-			if ((end - begin) / 1000 >= timeout) {
-				break;
-			}
-		}
-		long cost = System.currentTimeMillis();
-		logger.info("REClientTransport doSend msgId:{},cost :{} ms",msg.getRequestId(),(cost-begin));
-		return result;
+		resultFuture.setSentTime(System.currentTimeMillis());// 置为已发送
+		return resultFuture;
 	}
 
 }

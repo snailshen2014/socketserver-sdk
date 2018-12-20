@@ -208,7 +208,7 @@ public class NetUtils {
      * 得到本机IPv4地址
      *
      * @return ip地址
-     * @see JSFContext#getLocalHost()
+     * @see getLocalHost()
      */
     public static String getLocalHost() {
         InetAddress address = getLocalAddress();

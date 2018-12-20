@@ -3,10 +3,11 @@ package com.syj.tcpentrypoint.client;
 import com.syj.tcpentrypoint.transport.ClientTransport;
 
 /**
- * Title: 代表一个连接，封装了Provider和Transport<br>
- * <p/>
- * Description: 由于长连接复用，transport里的provider不一定是真正的Provider <br>
- * <p/>
+ * 
+*  @des    : 代表一个连接，封装了Provider和Transport
+*  由于长连接复用，transport里的provider不一定是真正的Provider
+ * @author:shenyanjun1
+ * @date   :2018-12-20 16:51
  */
 public class Connection {
 

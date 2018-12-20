@@ -215,7 +215,7 @@ public class ClientTransportFactory {
 	 * 关闭全部客户端连接
 	 */
 	public static void closeAll() {
-		logger.info("Shutdown all JSF client transport now...");
+		logger.info("Shutdown all  client transport now...");
 		try {
 			for (Map.Entry<String, ClientTransport> entrySet : connectionPool.entrySet()) {
 				ClientTransport clientTransport = entrySet.getValue();

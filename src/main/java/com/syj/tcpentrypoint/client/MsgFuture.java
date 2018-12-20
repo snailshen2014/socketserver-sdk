@@ -3,9 +3,7 @@ package com.syj.tcpentrypoint.client;
 
 
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -14,13 +12,10 @@ import com.syj.tcpentrypoint.error.ClientTimeoutException;
 import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.MessageHeader;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
-import com.syj.tcpentrypoint.util.Constants;
 import com.syj.tcpentrypoint.util.DateUtils;
 import com.syj.tcpentrypoint.util.NetUtils;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.handler.ssl.ApplicationProtocolConfig.Protocol;
 
 /**
  * Title: 返回消息Future <br>
@@ -77,10 +72,6 @@ public class MsgFuture<V> implements java.util.concurrent.Future<V>{
      */
     private boolean asyncCall;
 
-    /**
-     * 当前请求服务端版本 1.5.0+有此值
-     */
-    private Short providerJsfVersion;
     /**
      * 构造函数
      *
@@ -468,23 +459,5 @@ public class MsgFuture<V> implements java.util.concurrent.Future<V>{
     public void setAsyncCall(boolean asyncCall) {
         this.asyncCall = asyncCall;
     }
-
-    /**
-     * 服务端jsf版本号
-     *
-     * @return 服务端jsf版本号
-     */
-    public Short getProviderJsfVersion() {
-        return providerJsfVersion;
-    }
-
-    /**
-     * 服务端jsf版本号
-     *
-     * @param providerJsfVersion
-     *         服务端jsf版本号
-     */
-    public void setProviderJsfVersion(Short providerJsfVersion) {
-        this.providerJsfVersion = providerJsfVersion;
-    }
+   
 }
