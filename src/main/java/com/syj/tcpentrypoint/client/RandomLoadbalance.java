@@ -20,9 +20,9 @@ public class RandomLoadbalance extends Loadbalance {
     /**
      * @see Loadbalance#doSelect(Invocation, java.util.List)
      */
-    public Provider doSelect( List<Provider> providers) {
+    public Endpoint doSelect( List<Endpoint> providers) {
 
-        Provider provider = null;
+        Endpoint provider = null;
         int length = providers.size(); // 总个数
         int totalWeight = 0; // 总权重
         boolean sameWeight = true; // 权重是否都一样

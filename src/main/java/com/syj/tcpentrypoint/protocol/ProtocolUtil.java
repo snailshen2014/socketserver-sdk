@@ -1,10 +1,8 @@
 package com.syj.tcpentrypoint.protocol;
 
 import java.nio.charset.Charset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.syj.tcpentrypoint.error.RECodecException;
 import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
@@ -14,7 +12,6 @@ import com.syj.tcpentrypoint.msg.ResponseMessage;
 import com.syj.tcpentrypoint.util.CodecUtils;
 import com.syj.tcpentrypoint.util.Constants;
 import com.syj.tcpentrypoint.util.ExceptionUtils;
-
 import io.netty.buffer.ByteBuf;
 
 /**
@@ -124,9 +121,5 @@ public class ProtocolUtil {
 		}
 		return msg;
 
-	}
-
-	private static String bytetoString(ByteBuf buf) {
-		return buf.toString(Charset.defaultCharset());
 	}
 }

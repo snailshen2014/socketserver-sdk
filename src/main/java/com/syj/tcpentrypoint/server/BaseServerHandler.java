@@ -4,7 +4,6 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -12,19 +11,16 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.RequestMessage;
-import com.syj.tcpentrypoint.transport.ServerTransportConfig;
+import com.syj.tcpentrypoint.transport.ServerEndpointConfig;
 import com.syj.tcpentrypoint.util.Constants;
 import com.syj.tcpentrypoint.util.ExceptionUtils;
 import com.syj.tcpentrypoint.util.NamedThreadFactory;
 import com.syj.tcpentrypoint.util.NetUtils;
 import com.syj.tcpentrypoint.util.ThreadPoolUtils;
-
 import io.netty.channel.Channel;
 
 /**
@@ -33,17 +29,13 @@ import io.netty.channel.Channel;
  * @author:shenyanjun1
  * @date   :2018-12-14 17:12
  */
-public class BaseServerHandler implements ServerHandler {
+public class BaseServerHandler implements ServerEndpointHandler {
 
 	/**
 	 * slf4j Logger for this class
 	 */
 	private final static Logger logger = LoggerFactory.getLogger(BaseServerHandler.class);
 
-	/**
-	 * 一个端口对应一个ServerHandler
-	 */
-	private static Map<String, BaseServerHandler> serverHandlerMap = new ConcurrentHashMap<String, BaseServerHandler>();
 
 	//business pool
 	private final ExecutorService bizThreadPool; 
@@ -56,14 +48,14 @@ public class BaseServerHandler implements ServerHandler {
 	/**
 	 * Server Transport Config
 	 */
-	private final ServerTransportConfig serverTransportConfig;
+	private final ServerEndpointConfig serverTransportConfig;
 
 	/**
 	 * Instantiates a new Base server handler.
 	 *
 	 * @param transportConfig the transport config
 	 */
-	public BaseServerHandler(ServerTransportConfig serverTransportConfig) {
+	public BaseServerHandler(ServerEndpointConfig serverTransportConfig) {
 		this.serverTransportConfig = serverTransportConfig;
 		this.bizThreadPool = initPool();
 	}
@@ -186,7 +178,7 @@ public class BaseServerHandler implements ServerHandler {
 	 *
 	 * @return 配置
 	 */
-	public ServerTransportConfig getServerTransportConfig() {
+	public ServerEndpointConfig getServerTransportConfig() {
 		return serverTransportConfig;
 	}
 

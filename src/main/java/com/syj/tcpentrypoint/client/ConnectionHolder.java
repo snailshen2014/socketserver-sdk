@@ -16,15 +16,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.syj.tcpentrypoint.config.ClientConfig;
-import com.syj.tcpentrypoint.error.ClientClosedException;
+import com.syj.tcpentrypoint.config.ClientEndpointConfig;
+import com.syj.tcpentrypoint.error.ClientEndpointClosedException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
 import com.syj.tcpentrypoint.msg.MessageBuilder;
-import com.syj.tcpentrypoint.transport.ClientTransport;
-import com.syj.tcpentrypoint.transport.ClientTransportFactory;
+import com.syj.tcpentrypoint.transport.ClientEndpointTransport;
+import com.syj.tcpentrypoint.transport.ClientEndpointFactory;
 import com.syj.tcpentrypoint.util.ExceptionUtils;
 import com.syj.tcpentrypoint.util.NetUtils;
-import com.syj.tcpentrypoint.util.ScheduledService;
+import com.syj.tcpentrypoint.util.ScheduledExecutor;
 
 /**
  * 
@@ -42,21 +42,21 @@ public class ConnectionHolder {
 	/**
 	 * 存活的客户端列表
 	 */
-	private ConcurrentHashMap<Provider, ClientTransport> aliveConnections = new ConcurrentHashMap<Provider, ClientTransport>();
+	private ConcurrentHashMap<Endpoint, ClientEndpointTransport> aliveConnections = new ConcurrentHashMap<Endpoint, ClientEndpointTransport>();
 
 	/**
 	 * 存活但是亚健康节点（连续心跳超时，这种只发心跳，不发请求）
 	 */
-	private ConcurrentHashMap<Provider, ClientTransport> subHealthConnections = new ConcurrentHashMap<Provider, ClientTransport>();
+	private ConcurrentHashMap<Endpoint, ClientEndpointTransport> subHealthConnections = new ConcurrentHashMap<Endpoint, ClientEndpointTransport>();
 
 	/**
 	 * 失败的客户端(从来没连上过的）
 	 */
-	private ConcurrentHashMap<Provider, ClientConfig> deadConnections = new ConcurrentHashMap<Provider, ClientConfig>();
+	private ConcurrentHashMap<Endpoint, ClientEndpointConfig> deadConnections = new ConcurrentHashMap<Endpoint, ClientEndpointConfig>();
 	/**
 	 * 失败待重试的客户端列表（连上后断开的）
 	 */
-	private ConcurrentHashMap<Provider, ClientTransport> retryConnections = new ConcurrentHashMap<Provider, ClientTransport>();
+	private ConcurrentHashMap<Endpoint, ClientEndpointTransport> retryConnections = new ConcurrentHashMap<Endpoint, ClientEndpointTransport>();
 
 	/**
 	 * 客户端变化provider的锁
@@ -66,14 +66,14 @@ public class ConnectionHolder {
 	/**
 	 * 当前服务集群对应的Consumer信息
 	 */
-	protected final ClientConfig consumerConfig;
+	protected final ClientEndpointConfig consumerConfig;
 
 	/**
 	 * 构造函数
 	 *
 	 * @param consumerConfig ConsumerConfig
 	 */
-	public ConnectionHolder(ClientConfig clientConfig) {
+	public ConnectionHolder(ClientEndpointConfig clientConfig) {
 		this.consumerConfig = clientConfig;
 	}
 
@@ -82,7 +82,7 @@ public class ConnectionHolder {
 	 *
 	 * @return the alive connections
 	 */
-	public ConcurrentHashMap<Provider, ClientTransport> getAliveConnections() {
+	public ConcurrentHashMap<Endpoint, ClientEndpointTransport> getAliveConnections() {
 		return aliveConnections.isEmpty() ? subHealthConnections : aliveConnections;
 	}
 
@@ -91,10 +91,10 @@ public class ConnectionHolder {
 	 *
 	 * @return all alive providers
 	 */
-	public List<Provider> getAliveProviders() {
-		ConcurrentHashMap<Provider, ClientTransport> map = aliveConnections.isEmpty() ? subHealthConnections
+	public List<Endpoint> getAliveProviders() {
+		ConcurrentHashMap<Endpoint, ClientEndpointTransport> map = aliveConnections.isEmpty() ? subHealthConnections
 				: aliveConnections;
-		return new ArrayList<Provider>(map.keySet());
+		return new ArrayList<Endpoint>(map.keySet());
 	}
 
 	/**
@@ -103,8 +103,8 @@ public class ConnectionHolder {
 	 * @param provider the provider
 	 * @return the client transport
 	 */
-	public ClientTransport getAliveClientTransport(Provider provider) {
-		ClientTransport transport = aliveConnections.get(provider);
+	public ClientEndpointTransport getAliveClientTransport(Endpoint provider) {
+		ClientEndpointTransport transport = aliveConnections.get(provider);
 		return transport != null ? transport : subHealthConnections.get(provider);
 	}
 
@@ -122,7 +122,7 @@ public class ConnectionHolder {
 	 *
 	 * @return the dead connections
 	 */
-	public ConcurrentHashMap<Provider, ClientConfig> getDeadConnections() {
+	public ConcurrentHashMap<Endpoint, ClientEndpointConfig> getDeadConnections() {
 		return deadConnections;
 	}
 
@@ -131,7 +131,7 @@ public class ConnectionHolder {
 	 *
 	 * @return the retry connections
 	 */
-	public ConcurrentHashMap<Provider, ClientTransport> getRetryConnections() {
+	public ConcurrentHashMap<Endpoint, ClientEndpointTransport> getRetryConnections() {
 		return retryConnections;
 	}
 
@@ -141,7 +141,7 @@ public class ConnectionHolder {
 	 * @param provider  the provider
 	 * @param transport the transport
 	 */
-	protected void addAlive(Provider provider, ClientTransport transport) {
+	protected void addAlive(Endpoint provider, ClientEndpointTransport transport) {
 //        if (reliveToRetry(checkedInfo.isProviderExportedFully(),provider, transport)) {
 //            return;
 //        }
@@ -155,7 +155,7 @@ public class ConnectionHolder {
 	 * @param provider  the provider
 	 * @param transport the transport
 	 */
-	protected void addRetry(Provider provider, ClientTransport transport) {
+	protected void addRetry(Endpoint provider, ClientEndpointTransport transport) {
 		retryConnections.put(provider, transport);
 		heartbeat_failed_counter.put(provider, new AtomicInteger(0));
 	}
@@ -166,7 +166,7 @@ public class ConnectionHolder {
 	 * @param provider the provider
 	 * @param config   the config
 	 */
-	protected void addDead(Provider provider, ClientConfig config) {
+	protected void addDead(Endpoint provider, ClientEndpointConfig config) {
 		deadConnections.put(provider, config);
 		heartbeat_failed_counter.put(provider, new AtomicInteger(0));
 	}
@@ -177,7 +177,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void aliveToRetryIfExist(Provider provider, ClientTransport transport) {
+	protected void aliveToRetryIfExist(Endpoint provider, ClientEndpointTransport transport) {
 		providerLock.lock();
 		try {
 			boolean first = isAliveEmpty();
@@ -198,7 +198,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void retryToAlive(Provider provider, ClientTransport transport) {
+	protected void retryToAlive(Endpoint provider, ClientEndpointTransport transport) {
 		providerLock.lock();
 		try {
 			if (retryConnections.remove(provider) != null) {
@@ -215,7 +215,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void deadToAlive(Provider provider, ClientTransport transport) {
+	protected void deadToAlive(Endpoint provider, ClientEndpointTransport transport) {
 		providerLock.lock();
 		try {
 			if (deadConnections.remove(provider) != null) {
@@ -232,7 +232,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void deadToRetry(Provider provider, ClientTransport transport) {
+	protected void deadToRetry(Endpoint provider, ClientEndpointTransport transport) {
 		providerLock.lock();
 		try {
 			if (deadConnections.remove(provider) != null) {
@@ -249,7 +249,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void aliveToSubHealth(Provider provider, ClientTransport transport) {
+	protected void aliveToSubHealth(Endpoint provider, ClientEndpointTransport transport) {
 		providerLock.lock();
 		try {
 			if (aliveConnections.remove(provider) != null) {
@@ -266,7 +266,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void subHealthToAlive(Provider provider, ClientTransport transport) {
+	protected void subHealthToAlive(Endpoint provider, ClientEndpointTransport transport) {
 
 	}
 
@@ -276,7 +276,7 @@ public class ConnectionHolder {
 	 * @param provider  Provider
 	 * @param transport 连接
 	 */
-	protected void subHealthToRetry(Provider provider, ClientTransport transport) {
+	protected void subHealthToRetry(Endpoint provider, ClientEndpointTransport transport) {
 		providerLock.lock();
 		try {
 			if (subHealthConnections.remove(provider) != null) {
@@ -293,10 +293,10 @@ public class ConnectionHolder {
 	 * @param provider the provider
 	 * @return 如果已经建立连接 ，返回ClientTransport
 	 */
-	protected ClientTransport remove(Provider provider) {
+	protected ClientEndpointTransport remove(Endpoint provider) {
 		providerLock.lock();
 		try {
-			ClientTransport transport = aliveConnections.remove(provider);
+			ClientEndpointTransport transport = aliveConnections.remove(provider);
 			if (transport == null) {
 				transport = subHealthConnections.remove(provider);
 				if (transport == null) {
@@ -318,11 +318,11 @@ public class ConnectionHolder {
 	 *
 	 * @return 被删掉的存活或者死亡HashMap<Provider hash map
 	 */
-	protected HashMap<Provider, ClientTransport> clear() {
+	protected HashMap<Endpoint, ClientEndpointTransport> clear() {
 		providerLock.lock();
 		try {
 			// 当前存活+重试的
-			HashMap<Provider, ClientTransport> all = new HashMap<Provider, ClientTransport>(aliveConnections);
+			HashMap<Endpoint, ClientEndpointTransport> all = new HashMap<Endpoint, ClientEndpointTransport>(aliveConnections);
 			all.putAll(subHealthConnections);
 			all.putAll(retryConnections);
 			deadConnections.clear();
@@ -359,10 +359,10 @@ public class ConnectionHolder {
 	 *
 	 * @return 当前的Provider列表 set
 	 */
-	public Set<Provider> currentProviderList() {
+	public Set<Endpoint> currentProviderList() {
 		providerLock.lock();
 		try {
-			Set<Provider> providers = new HashSet<>();
+			Set<Endpoint> providers = new HashSet<>();
 			providers.addAll(aliveConnections.keySet());
 			providers.addAll(subHealthConnections.keySet());
 			providers.addAll(retryConnections.keySet());
@@ -378,14 +378,14 @@ public class ConnectionHolder {
 	 *
 	 * @return 当前的Provider列表 set
 	 */
-	public Map<String, Set<Provider>> currentProviderMap() {
+	public Map<String, Set<Endpoint>> currentProviderMap() {
 		providerLock.lock();
 		try {
-			Map<String, Set<Provider>> tmp = new LinkedHashMap<String, Set<Provider>>();
-			tmp.put("alive", new HashSet<Provider>(aliveConnections.keySet()));
-			tmp.put("subHealth", new HashSet<Provider>(subHealthConnections.keySet()));
-			tmp.put("retry", new HashSet<Provider>(retryConnections.keySet()));
-			tmp.put("dead", new HashSet<Provider>(deadConnections.keySet()));
+			Map<String, Set<Endpoint>> tmp = new LinkedHashMap<String, Set<Endpoint>>();
+			tmp.put("alive", new HashSet<Endpoint>(aliveConnections.keySet()));
+			tmp.put("subHealth", new HashSet<Endpoint>(subHealthConnections.keySet()));
+			tmp.put("retry", new HashSet<Endpoint>(retryConnections.keySet()));
+			tmp.put("dead", new HashSet<Endpoint>(deadConnections.keySet()));
 			return tmp;
 		} finally {
 			providerLock.unlock();
@@ -399,7 +399,7 @@ public class ConnectionHolder {
 	 * @param transport   ClientTransport对象
 	 * @return 是否存活
 	 */
-	protected boolean doubleCheck(Provider provider, ClientTransport transport) {
+	protected boolean doubleCheck(Endpoint provider, ClientEndpointTransport transport) {
 		if (transport.isOpen()) {
 			try { // 睡一下下 防止被连上又被服务端踢下线
 				Thread.sleep(100);
@@ -421,12 +421,12 @@ public class ConnectionHolder {
 	/**
 	 * 重连+心跳线程
 	 */
-	private volatile ScheduledService reconThread;
+	private volatile ScheduledExecutor reconThread;
 
 	/**
 	 * 心跳线程
 	 */
-	private volatile ScheduledService hbThread;
+	private volatile ScheduledExecutor hbThread;
 
 	/**
 	 * 重试次数标记（针对每个Provider不一样）
@@ -443,7 +443,7 @@ public class ConnectionHolder {
 		int reconnect = consumerConfig.getReconnect();
 		if (reconnect > 0) {
 			reconnect = Math.max(reconnect, 2000); // 最小2000
-			reconThread = new ScheduledService("RE-CLI-RC-" + apName, ScheduledService.MODE_FIXEDDELAY, new Runnable() {
+			reconThread = new ScheduledExecutor("RE-CLI-RC-" + apName, ScheduledExecutor.MODE_FIXEDDELAY, new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -458,7 +458,7 @@ public class ConnectionHolder {
 		int heartbeat = consumerConfig.getHeartbeat();
 		if (heartbeat > 0) {
 			heartbeat = Math.max(heartbeat, 5000); // 最小5000
-			hbThread = new ScheduledService("RE-CLI-HB-" + apName, ScheduledService.MODE_FIXEDDELAY, new Runnable() {
+			hbThread = new ScheduledExecutor("RE-CLI-HB-" + apName, ScheduledExecutor.MODE_FIXEDDELAY, new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -479,17 +479,17 @@ public class ConnectionHolder {
 		int thisTime = reconnectFlag.incrementAndGet();
 		boolean print = thisTime % 6 == 0; // 是否打印error,每6次打印一次
 		boolean isAliveEmptyFirst = isAliveEmpty();
-		for (Map.Entry<Provider, ClientConfig> entry : getDeadConnections().entrySet()) {
-			Provider provider = entry.getKey();
+		for (Map.Entry<Endpoint, ClientEndpointConfig> entry : getDeadConnections().entrySet()) {
+			Endpoint provider = entry.getKey();
 			int providerPeriodCoefficient = provider.getReconnectPeriodCoefficient();
 			;
 			if (thisTime % providerPeriodCoefficient != 0) {
 				continue; // 如果命中重连周期，则进行重连
 			}
-			ClientConfig config = entry.getValue();
+			ClientEndpointConfig config = entry.getValue();
 			LOGGER.debug("Retry connect to {} provider:{} ...", config.getAppName(), provider);
 			try {
-				ClientTransport transport = ClientTransportFactory.getClientTransport(config);
+				ClientEndpointTransport transport = ClientEndpointFactory.getClientTransport(config);
 				if (doubleCheck(config.getAppName(), provider, transport)) {
 					LOGGER.info(
 							"Connect to {} provider:{} success by retry !! The connection is " + NetUtils
@@ -511,13 +511,13 @@ public class ConnectionHolder {
 				}
 			}
 		}
-		for (Map.Entry<Provider, ClientTransport> entry : getRetryConnections().entrySet()) {
-			Provider provider = entry.getKey();
+		for (Map.Entry<Endpoint, ClientEndpointTransport> entry : getRetryConnections().entrySet()) {
+			Endpoint provider = entry.getKey();
 			int providerPeriodCoefficient = provider.getReconnectPeriodCoefficient();
 			if (thisTime % providerPeriodCoefficient != 0) {
 				continue; // 如果命中重连周期，则进行重连
 			}
-			ClientTransport transport = entry.getValue();
+			ClientEndpointTransport transport = entry.getValue();
 			LOGGER.debug("Retry connect to {} provider:{} ...", appName, provider);
 			try {
 				transport.reconnect();
@@ -547,16 +547,16 @@ public class ConnectionHolder {
 	/**
 	 * 心跳失败计数器
 	 */
-	private ConcurrentHashMap<Provider, AtomicInteger> heartbeat_failed_counter = new ConcurrentHashMap<Provider, AtomicInteger>();
+	private ConcurrentHashMap<Endpoint, AtomicInteger> heartbeat_failed_counter = new ConcurrentHashMap<Endpoint, AtomicInteger>();
 
 	/**
 	 * 给存活的和亚健康的节点发心跳
 	 */
 	private void sendHeartbeat() {
-		for (Map.Entry<Provider, ClientTransport> entry : aliveConnections.entrySet()) {
+		for (Map.Entry<Endpoint, ClientEndpointTransport> entry : aliveConnections.entrySet()) {
 			sendHeartbeatToProvider(entry.getKey(), entry.getValue(), true);
 		}
-		for (Map.Entry<Provider, ClientTransport> entry : subHealthConnections.entrySet()) {
+		for (Map.Entry<Endpoint, ClientEndpointTransport> entry : subHealthConnections.entrySet()) {
 			sendHeartbeatToProvider(entry.getKey(), entry.getValue(), false);
 		}
 	}
@@ -568,7 +568,7 @@ public class ConnectionHolder {
 	 * @param transport       连接
 	 * @param isAliveProvider 是否存活列表
 	 */
-	private void sendHeartbeatToProvider(Provider provider, ClientTransport transport, boolean isAliveProvider) {
+	private void sendHeartbeatToProvider(Endpoint provider, ClientEndpointTransport transport, boolean isAliveProvider) {
 		String appName = consumerConfig.getAppName();
 		if (!transport.isOpen()) {
 			aliveToRetryIfExist(provider, transport);
@@ -604,8 +604,8 @@ public class ConnectionHolder {
 					} else {
 						subHealthToRetry(provider, transport); // 亚健康到重试
 					}
-					exception = e instanceof ClientClosedException ? e
-							: new ClientClosedException("Channel has been closed when send heartbeat");
+					exception = e instanceof ClientEndpointClosedException ? e
+							: new ClientEndpointClosedException("Channel has been closed when send heartbeat");
 					break; // 正常断线的情况
 				} else {
 					addFailedCnt(provider);
@@ -628,21 +628,21 @@ public class ConnectionHolder {
 		}
 	}
 
-	private void addFailedCnt(Provider provider) {
+	private void addFailedCnt(Endpoint provider) {
 		AtomicInteger cnt = heartbeat_failed_counter.get(provider);
 		if (cnt != null) {
 			cnt.incrementAndGet();
 		}
 	}
 
-	private void resetFailedCnt(Provider provider) {
+	private void resetFailedCnt(Endpoint provider) {
 		AtomicInteger cnt = heartbeat_failed_counter.get(provider);
 		if (cnt != null) {
 			cnt.set(0);
 		}
 	}
 
-	private int getFailedCnt(Provider provider) {
+	private int getFailedCnt(Endpoint provider) {
 		AtomicInteger cnt = heartbeat_failed_counter.get(provider);
 		return cnt != null ? cnt.get() : 0;
 	}
@@ -669,7 +669,7 @@ public class ConnectionHolder {
 	 * @param transport
 	 * @return true 存活节点如果不包含指定的服务
 	 */
-	private boolean reliveToRetry(boolean isProviderExportedFully, Provider provider, ClientTransport transport) {
+	private boolean reliveToRetry(boolean isProviderExportedFully, Endpoint provider, ClientEndpointTransport transport) {
 		if (!isProviderExportedFully) {
 			provider.setReconnectPeriodCoefficient(5);
 			addRetry(provider, transport);
@@ -687,7 +687,7 @@ public class ConnectionHolder {
 	 * @param transport   ClientTransport对象
 	 * @return 是否存活
 	 */
-	protected boolean doubleCheck(String appName, Provider provider, ClientTransport transport) {
+	protected boolean doubleCheck(String appName, Endpoint provider, ClientEndpointTransport transport) {
 		if (transport.isOpen()) {
 			try { // 睡一下下 防止被连上又被服务端踢下线
 				Thread.sleep(100);

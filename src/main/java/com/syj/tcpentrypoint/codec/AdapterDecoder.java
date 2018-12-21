@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.syj.tcpentrypoint.re.REDecoder;
 import com.syj.tcpentrypoint.re.REEncoder;
-import com.syj.tcpentrypoint.transport.ServerChannelHandler;
+import com.syj.tcpentrypoint.transport.ServerEndpointChannelHandler;
 import com.syj.tcpentrypoint.util.Constants;
 import com.syj.tcpentrypoint.util.NetUtils;
 
@@ -31,13 +31,13 @@ public class AdapterDecoder extends ByteToMessageDecoder {
      */
     private final static Logger LOGGER = LoggerFactory.getLogger(AdapterDecoder.class);
 
-    public AdapterDecoder(ServerChannelHandler serverChannelHandler, int payload) {
+    public AdapterDecoder(ServerEndpointChannelHandler serverChannelHandler, int payload) {
         this.serverChannelHandler = serverChannelHandler;
         this.payload = payload;
     
     }
 
-    private final ServerChannelHandler serverChannelHandler;
+    private final ServerEndpointChannelHandler serverChannelHandler;
     
     //max data 
     int payload;

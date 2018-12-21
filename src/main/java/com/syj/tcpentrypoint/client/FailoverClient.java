@@ -2,7 +2,7 @@ package com.syj.tcpentrypoint.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.syj.tcpentrypoint.config.ClientConfig;
+import com.syj.tcpentrypoint.config.ClientEndpointConfig;
 import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.RequestMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
@@ -13,7 +13,7 @@ import com.syj.tcpentrypoint.msg.ResponseMessage;
  * @author:shenyanjun1
  * @date   :2018-12-20 16:52
  */
-public class FailoverClient extends Client {
+public class FailoverClient extends ClientEndpoint {
 
 	/**
 	 * slf4j logger for this class
@@ -24,7 +24,7 @@ public class FailoverClient extends Client {
 	/**
 	 * @param consumerConfig ConsumerConfig
 	 */
-	public FailoverClient(ClientConfig consumerConfig) {
+	public FailoverClient(ClientEndpointConfig consumerConfig) {
 		super(consumerConfig);
 	}
 
@@ -44,14 +44,14 @@ public class FailoverClient extends Client {
                     }
                    	break;
                 } else {
-                    throwable = new RpcException("Failed to call "+ " on remote server " + connection.getProvider() + ", return null");
+                    throwable = new RpcException("Failed to call "+ " on remote server " + connection.getEndPoint() + ", return null");
                     time++;
                 }
             } catch (RpcException e) { // rpc异常重试
                 throwable = e;
                 time++;
 			} catch (Exception e) { // 其它异常不重试
-                throw new RpcException("Failed to call "+ " on remote server: " + connection.getProvider() + ", cause by unknown exception: "
+                throw new RpcException("Failed to call "+ " on remote server: " + connection.getEndPoint() + ", cause by unknown exception: "
                         + e.getClass().getName() + ", message is: " + e.getMessage(), e);
             }
           

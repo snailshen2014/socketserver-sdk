@@ -1,10 +1,10 @@
-import com.syj.tcpentrypoint.transport.ServerTransport;
-import com.syj.tcpentrypoint.transport.ServerTransportConfig;
+import com.syj.tcpentrypoint.transport.ServerEndpoint;
+import com.syj.tcpentrypoint.transport.ServerEndpointConfig;
 
 public class TestServer {
 	public static void main(String[] args) {
-		ServerTransportConfig config = new ServerTransportConfig();
-		ServerTransport server = new ServerTransport(config);
+		ServerEndpointConfig config = new ServerEndpointConfig();
+		ServerEndpoint server = new ServerEndpoint(config);
 		server.start();
 		synchronized (TestServer.class) {
 			while (true) {

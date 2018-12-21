@@ -14,11 +14,7 @@ public class RpcException extends RuntimeException implements Serializable {
      *
      */
     private static final long serialVersionUID = 7772360050382788166L;
-
-    private int errorCode = 2;
-
     protected String errorMsg;
-
     private transient MessageHeader msgHeader;
 
     // 需要序列化支持

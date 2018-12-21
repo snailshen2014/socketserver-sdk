@@ -9,10 +9,7 @@ public class InitErrorException extends RuntimeException {
 
     private static final long serialVersionUID = 4401440531171871948L;
 
-    private int errorCode = 1;
-
     private String errorMsg;
-
     protected InitErrorException() {
 
     }

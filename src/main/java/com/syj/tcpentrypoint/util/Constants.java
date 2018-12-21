@@ -27,7 +27,6 @@ public class Constants {
 
 
     public static final Boolean isLinux = true;
-
     public static final int CPU_CORES = 4;
     /*---------环境变量结束-----------*/
 

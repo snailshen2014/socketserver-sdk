@@ -1,6 +1,6 @@
 package com.syj.tcpentrypoint.client;
 
-import com.syj.tcpentrypoint.transport.ClientTransport;
+import com.syj.tcpentrypoint.transport.ClientEndpointTransport;
 
 /**
  * 
@@ -11,20 +11,20 @@ import com.syj.tcpentrypoint.transport.ClientTransport;
  */
 public class Connection {
 
-    private final Provider provider;
+    private final Endpoint endPoint;
 
-    private final ClientTransport transport;
+    private final ClientEndpointTransport transport;
 
-    public Connection(Provider provider, ClientTransport transport) {
-        this.provider = provider;
+    public Connection(Endpoint endpoint, ClientEndpointTransport transport) {
+        this.endPoint = endpoint;
         this.transport = transport;
     }
 
-    public Provider getProvider() {
-        return provider;
+    public Endpoint getEndPoint() {
+        return endPoint;
     }
 
-    public ClientTransport getTransport() {
+    public ClientEndpointTransport getTransport() {
         return transport;
     }
 }

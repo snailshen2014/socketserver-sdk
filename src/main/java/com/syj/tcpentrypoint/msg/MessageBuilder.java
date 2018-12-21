@@ -18,7 +18,6 @@ public class MessageBuilder {
 	 * @return
 	 */
 	public static RequestMessage buildRequest(String topicId,String productKey) {
-		
 		RequestMessage requestMessage = new RequestMessage();
 		requestMessage.getMsgHeader().setMsgType(Constants.REQUEST_MSG);
 		requestMessage.getMsgHeader().addHeadKey(HeadKey.topicid, topicId);

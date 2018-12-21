@@ -1,9 +1,9 @@
 package com.syj.tcpentrypoint.client;
 
 import java.util.List;
-import com.syj.tcpentrypoint.config.ClientConfig;
+import com.syj.tcpentrypoint.config.ClientEndpointConfig;
 import com.syj.tcpentrypoint.error.IllegalConfigureException;
-import com.syj.tcpentrypoint.error.NoAliveProviderException;
+import com.syj.tcpentrypoint.error.NoAliveEndpointException;
 import com.syj.tcpentrypoint.util.Constants;
 
 /**
@@ -17,7 +17,7 @@ public abstract class Loadbalance {
     /**
      * 一些客户端的配置
      */
-    protected ClientConfig consumerConfig;
+    protected ClientEndpointConfig consumerConfig;
 
     /**
      * 得到负载均衡算法
@@ -54,9 +54,9 @@ public abstract class Loadbalance {
      *         可用连接
      * @return provider
      */
-    public Provider select( List<Provider> providers) {
+    public Endpoint select( List<Endpoint> providers) {
         if (providers.size() == 0) {
-            throw new NoAliveProviderException(consumerConfig.getAppName(), providers);
+            throw new NoAliveEndpointException(consumerConfig.getAppName(), providers);
         }
         if (providers.size() == 1) {
             return providers.get(0);
@@ -75,14 +75,14 @@ public abstract class Loadbalance {
      * @return 服务端连接 provider
      */
 
-    public abstract Provider doSelect( List<Provider> providers);
+    public abstract Endpoint doSelect( List<Endpoint> providers);
 
     /**
      * Gets consumer config.
      *
      * @return the consumer config
      */
-    public ClientConfig getConsumerConfig() {
+    public ClientEndpointConfig getConsumerConfig() {
         return consumerConfig;
     }
 
@@ -92,7 +92,7 @@ public abstract class Loadbalance {
      * @param consumerConfig
      *         the consumer config
      */
-    public void setConsumerConfig(ClientConfig consumerConfig) {
+    public void setConsumerConfig(ClientEndpointConfig consumerConfig) {
         this.consumerConfig = consumerConfig;
     }
 
@@ -103,7 +103,7 @@ public abstract class Loadbalance {
      *         the provider
      * @return the weight
      */
-    protected int getWeight(Provider provider) {
+    protected int getWeight(Endpoint provider) {
         // 从provider中或得到相关权重,默认值100
         return provider.getWeight() < 0 ? 0 : provider.getWeight();
     }

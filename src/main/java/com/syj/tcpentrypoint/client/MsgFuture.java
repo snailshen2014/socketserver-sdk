@@ -8,7 +8,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.syj.tcpentrypoint.error.ClientTimeoutException;
+import com.syj.tcpentrypoint.error.ClientEndpointTimeoutException;
 import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.MessageHeader;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
@@ -158,7 +158,7 @@ public class MsgFuture<V> implements java.util.concurrent.Future<V>{
      *         是否扫描线程
      * @return 异常ClientTimeoutException
      */
-    public ClientTimeoutException clientTimeoutException(boolean scan) {
+    public ClientEndpointTimeoutException clientTimeoutException(boolean scan) {
         Date now = new Date();
         String errorMsg = (sentTime > 0 ? "Waiting provider return response timeout"
                 : "Consumer send request timeout")
@@ -172,7 +172,7 @@ public class MsgFuture<V> implements java.util.concurrent.Future<V>{
                 + "ms, MsgHeader: " + this.header
                 + ", Channel: " + NetUtils.channelToString(channel.localAddress(), channel.remoteAddress()))
                 + (scan ? ", throws by scan thread" : ".");
-        return new ClientTimeoutException(errorMsg);
+        return new ClientEndpointTimeoutException(errorMsg);
     }
 
     public boolean isSuccess() {

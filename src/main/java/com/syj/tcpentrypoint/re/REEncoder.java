@@ -1,16 +1,13 @@
 
 package com.syj.tcpentrypoint.re;
 
-import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.syj.tcpentrypoint.error.RECodecException;
 import com.syj.tcpentrypoint.msg.BaseMessage;
 import com.syj.tcpentrypoint.protocol.ProtocolUtil;
 import com.syj.tcpentrypoint.util.Constants;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -21,8 +18,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @date   :2018-12-14 17:07
  */
 public class REEncoder extends MessageToByteEncoder {
-
-	private final static Logger logger = LoggerFactory.getLogger(REEncoder.class);
 
 	@Override
 	public void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
