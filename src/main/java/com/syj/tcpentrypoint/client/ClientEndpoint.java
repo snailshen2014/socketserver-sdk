@@ -23,12 +23,14 @@ import com.syj.tcpentrypoint.error.NoAliveEndpointException;
 import com.syj.tcpentrypoint.error.RpcException;
 import com.syj.tcpentrypoint.msg.RequestMessage;
 import com.syj.tcpentrypoint.msg.ResponseMessage;
-import com.syj.tcpentrypoint.transport.ClientEndpointTransport;
 import com.syj.tcpentrypoint.transport.ClientEndpointFactory;
+import com.syj.tcpentrypoint.transport.ClientEndpointTransport;
 import com.syj.tcpentrypoint.util.ExceptionUtils;
 import com.syj.tcpentrypoint.util.NamedThreadFactory;
 import com.syj.tcpentrypoint.util.NetUtils;
 import com.syj.tcpentrypoint.util.StringUtils;
+
+
 
 /**
  * 
@@ -49,7 +51,7 @@ public abstract class ClientEndpoint {
 	protected ConnectionHolder connectionHolder;
 
 	/**
-	 * 当前服务集群对应的Consumer信息
+	 * 当前服务集群对应的client config
 	 */
 	protected final ClientEndpointConfig clientConfig;
 
@@ -177,34 +179,34 @@ public abstract class ClientEndpoint {
 	 *
 	 * @param providerList 服务端列表
 	 */
-	protected void connectToProviders(List<Endpoint> providerList) {
+	protected void connectToProviders(List<Endpoint> endpointList) {
 		final String appName = clientConfig.getAppName();
-		int providerSize = providerList.size();
-		LOGGER.info("Init provider of {},size is : {}", appName, providerSize);
-		if (providerSize > 0) {
+		int endPointSize = endpointList.size();
+		LOGGER.info("Init provider of {},size is : {}", appName, endPointSize);
+		if (endPointSize > 0) {
 			// 多线程建立连接
-			int threads = Math.min(10, providerSize); // 最大10个
-			final CountDownLatch latch = new CountDownLatch(providerSize);
+			int threads = Math.min(10, endPointSize); // 最大10个
+			final CountDownLatch latch = new CountDownLatch(endPointSize);
 			ThreadPoolExecutor initPool = new ThreadPoolExecutor(threads, threads, 0L, TimeUnit.MILLISECONDS,
-					new LinkedBlockingQueue<Runnable>(providerList.size()),
+					new LinkedBlockingQueue<Runnable>(endpointList.size()),
 					new NamedThreadFactory("RULESENGINE-CLI-CONN-" + appName, true));
-			for (final Endpoint provider : providerList) {
-				clientConfig.setProvider(provider);
+			for (final Endpoint endpoint : endpointList) {
+				final ClientEndpointConfig config = endpointToClientConfig(endpoint,clientConfig);
 				initPool.execute(new Runnable() {
 					@Override
 					public void run() {
 						try {
-							ClientEndpointTransport transport = ClientEndpointFactory.getClientTransport(clientConfig);
-							if (connectionHolder.doubleCheck(provider, transport)) {
-								printSuccess(provider, transport);
-								connectionHolder.addAlive(provider, transport);
+							ClientEndpointTransport transport = ClientEndpointFactory.getClientTransport(config);
+							if (connectionHolder.doubleCheck(endpoint, transport)) {
+								printSuccess(endpoint, transport);
+								connectionHolder.addAlive(endpoint, transport);
 							} else {
-								printFailure(provider, transport);
-								connectionHolder.addRetry(provider, transport);
+								printFailure(endpoint, transport);
+								connectionHolder.addRetry(endpoint, transport);
 							}
 						} catch (Exception e) {
-							printDead(provider, e);
-							connectionHolder.addDead(provider, clientConfig);
+							printDead(endpoint, e);
+							connectionHolder.addDead(endpoint, clientConfig);
 						} finally {
 							latch.countDown(); // 连上或者抛异常
 						}
@@ -213,8 +215,8 @@ public abstract class ClientEndpoint {
 			}
 
 			try {
-				int totalTimeout = ((providerSize % threads == 0) ? (providerSize / threads)
-						: ((providerSize / threads) + 1)) * clientConfig.getConnectTimeout() + 500;
+				int totalTimeout = ((endPointSize % threads == 0) ? (endPointSize / threads)
+						: ((endPointSize / threads) + 1)) * clientConfig.getConnectTimeout() + 500;
 				latch.await(totalTimeout, TimeUnit.MILLISECONDS); // 一直等到子线程都结束
 			} catch (InterruptedException e) {
 				LOGGER.error("Exception when init provider", e);
@@ -498,5 +500,17 @@ public abstract class ClientEndpoint {
 	public Map<String, Set<Endpoint>> currentProviderMap() {
 		return connectionHolder.currentProviderMap();
 	}
-
+	
+	 /**
+     * Endpoint对象得到 ClientTransportConfig
+     *
+     * @param endpoint
+     *         endpoint
+     * @return ClientEndpointConfig
+     */
+    private ClientEndpointConfig endpointToClientConfig(Endpoint endpoint,ClientEndpointConfig config) {
+    	ClientEndpointConfig temp = (ClientEndpointConfig)config.clone();
+    	temp.setProvider(endpoint);
+        return temp;
+    }
 }

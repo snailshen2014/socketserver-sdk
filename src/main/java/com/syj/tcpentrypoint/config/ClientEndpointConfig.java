@@ -1,14 +1,13 @@
 package com.syj.tcpentrypoint.config;
 
-import java.util.List;
 
 import com.syj.tcpentrypoint.client.Endpoint;
-import com.syj.tcpentrypoint.msg.ConnectListener;
 import com.syj.tcpentrypoint.util.Constants;
 import com.syj.tcpentrypoint.util.NamedThreadFactory;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+
 
 /**
  * 
@@ -17,7 +16,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
  * @date :2018-12-17 10:30
  * @param <T>
  */
-public class ClientEndpointConfig {
+public class ClientEndpointConfig implements Cloneable{
 
 	/*---------- 参数配置项开始 ------------*/
 
@@ -274,5 +273,14 @@ public class ClientEndpointConfig {
     public void setLoadbalance(String loadbalance) {
         this.loadbalance = loadbalance;
     }
-  
+    
+    public Object clone() {
+    	ClientEndpointConfig temp = null;
+    	try {
+    		temp = (ClientEndpointConfig) super.clone();
+    	} catch (CloneNotSupportedException e) {
+    		e.printStackTrace();
+    	}
+    	return temp;
+    }
 }

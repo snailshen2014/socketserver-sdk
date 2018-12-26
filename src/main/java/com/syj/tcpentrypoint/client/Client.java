@@ -28,7 +28,7 @@ public class Client {
 
 	private Client(ClientEndpointConfig config) {
 		try {
-			clientEndpoint = ClientEndpointFactory.getClient(config);
+			clientEndpoint = ClientFactory.getClient(config);
 			this.config = config; 
 		} catch (Exception e) {
 			LOGGER.error("Instance client error:{}",e.getMessage());
